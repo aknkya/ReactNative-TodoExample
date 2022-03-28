@@ -1,53 +1,113 @@
-import React, { Component } from 'react'
-import {
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  View,
-} from 'react-native'
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View } from "react-native";
+import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ToDoView from "./components/ToDoView";
+import Header from "./components/Header";
+import Input from "./components/Input";
 
-class App extends Component {
-  state = {
-    count: 0
-  }
+import { FlatList } from "react-native";
 
-  onPress = () => {
-    this.setState({
-      count: this.state.count + 1
-    })
-  }
 
- render() {
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity
-         style={styles.button}
-         onPress={this.onPress}
-        >
-         <Text>Click me</Text>
-        </TouchableOpacity>
-        <View>
-          <Text>
-            You clicked { this.state.count } times
-          </Text>
-        </View>
+
+
+
+
+
+export default function App() {
+  const [todoList, setTodoList] = useState([]);
+
+  const addTodo = (newTodo) => {
+    const tmpTodoList = [...todoList];
+    tmpTodoList.push(newTodo);
+    setTodoList(tmpTodoList);
+  };
+
+  const deleteTodo = (indexTodo) => {
+    const tmpTodoList = [...todoList];
+    tmpTodoList.splice(indexTodo, 1);
+    setTodoList(tmpTodoList);
+  };
+
+  const getTodos = () => {
+    AsyncStorage.getItem("todoList").then((jsonTodoList) => {
+      const todos = JSON.parse(jsonTodoList || "[]");
+      setTodoList(todos);
+    });
+  };
+
+  const saveTodo = () => {
+    AsyncStorage.setItem("todoList", JSON.stringify(todoList))
+      .then(() => {
+        console.log("Save OK !");
+      })
+      .catch((err) => {
+        console.log("ERROR !! " + err.message);
+      });
+  };
+
+  const updateTodoDone = (indexTodo) => {
+    const tmpTodoList = [...todoList];
+    tmpTodoList[indexTodo].done = !tmpTodoList[indexTodo].done;
+    setTodoList(tmpTodoList);
+  };
+
+  useEffect(() => {
+    getTodos();
+  }, []);
+
+  useEffect(() => {
+    saveTodo();
+  });
+
+
+  return (
+     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Header></Header>
       </View>
-    )
-  }
-}
+      <View>
+        <Input addTodo={addTodo}></Input>
+      </View>
+      <View style={styles.todolistContainer}>
+        <FlatList
+          data={todoList}
+          renderItem={({ item, index }) => (
+            <ToDoView
+              nameTodo={item.name}
+              todoDone={item.done}
+              indexTodo={index}
+              deleteTodo={deleteTodo}
+              updateTodoDone={updateTodoDone}
+            ></ToDoView>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+        ></FlatList>
+      </View>
+      <StatusBar hidden={true} style="auto" />
+    </View>
+   
+   
 
+  );
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+ 
   },
-  button: {
-    alignItems: 'center',
-    backgroundColor: '#DDDDDD',
-    padding: 10,
-    marginBottom: 10
-  }
-})
+  headerContainer: {
+    flex: 1,
+    backgroundColor: "#0074D9",
+  },
+  inputContainer: {
+    flex: 2,
+  },
+  todolistContainer: {
+    flex: 5,
+    
+  },
+});
 
-export default App;
+
