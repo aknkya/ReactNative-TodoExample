@@ -42,7 +42,7 @@ const toDoView = ({
 const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: "row",
-    backgroundColor: "#001f3f",
+    backgroundColor: "grey",
     margin: 10,
     padding: 10,
     justifyContent: "center",
@@ -54,9 +54,10 @@ const styles = StyleSheet.create({
   },
   nameTodo: {
     flex: 3,
-    fontSize: 15,
+    fontSize: 30,
     textAlign: "center",
     color: "white",
+    fontWeight:'bold',
   },
   deleteBtn: {
     flex: 1,

@@ -54,7 +54,7 @@ import {
       margin: 10,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#0074D9",
+      backgroundColor: "#009688",
       borderRadius: 15,
     },
     textButton: {
